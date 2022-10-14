@@ -1,0 +1,15 @@
+[tool.black]
+line_length = 100
+include = '(l8k/.*\.py$)'
+
+[tool.isort]
+profile = 'black'
+extend_skip = ['bin']
+line_length = 100
+
+# call using pflake8
+[tool.flake8]
+max-line-length = 110
+ignore = 'E203,E266,E501,W503,F403'
+select = 'B,C,E,F,I,W,T4,B9'
+exclude = '.venv*,dist,build,target,*.egg-info,.git'
