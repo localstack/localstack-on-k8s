@@ -142,7 +142,7 @@ def install():
     LOG.info("Create local k3d Kubernetes cluster inside Docker")
     _create_cluster()
 
-    LOG.info("Installing LocalStack Helm chart in kube cluster")
+    LOG.info("Installing LocalStack Helm chart in Kubernetes cluster")
     _install_helm_chart()
     _create_ingress()
 
