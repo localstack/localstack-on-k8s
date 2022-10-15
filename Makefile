@@ -9,7 +9,7 @@ install:    ## Install the dependencies in a virtualenv
 	test -d $(VENV_DIR) || virtualenv $(VENV_DIR)
 	$(VENV_RUN); $(PIP_CMD) install -e .
 
-init:       ## Initialize the kube cluster and install LocalStack
+init:       ## Initialize the Kubernetes cluster and install LocalStack
 	$(VENV_RUN); python -m l8k.run install
 
 deploy:     ## Deploy a sample app on the LocalStack instance
