@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import tempfile
@@ -64,6 +65,14 @@ class KubeCluster:
 
     def create(self):
         bin_file = self.install()
+
+        # check if cluster exists
+        clusters = json.loads(run([bin_file, "cluster", "list", "-o", "json"]))
+        matching = [c for c in clusters if c["name"] == K3D_CLUSTER_NAME]
+        if matching:
+            LOG.debug("Target k8d cluster '%s' already exists", K3D_CLUSTER_NAME)
+            return
+
         cmd = [
             bin_file,
             "cluster",
@@ -88,7 +97,7 @@ class KubeCluster:
 
     def write_kubectl_config(self):
         bin_file = self.install()
-        cmd = [bin_file, "kubeconfig", "merge", "-o", KUBE_CONFIG_FILE]
+        cmd = [bin_file, "kubeconfig", "merge", "-o", KUBE_CONFIG_FILE, K3D_CLUSTER_NAME]
         run(cmd)
 
 
@@ -108,7 +117,19 @@ def _install_helm_chart():
         if "already exists" not in str(e):
             raise
 
-    cmd = ["helm", "install", "localstack", "localstack/localstack"]
+    cmd = [
+        "helm",
+        "install",
+        "localstack",
+        "localstack/localstack",
+        "--set",
+        "debug=true",
+        "--set",
+        "extraEnvVars[0].name=DISABLE_CORS_CHECKS",
+        "--set-string",
+        "extraEnvVars[0].value=1",
+    ]
+    print(cmd)
     run(cmd)
 
 
