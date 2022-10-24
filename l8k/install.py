@@ -129,7 +129,6 @@ def _install_helm_chart():
         "--set-string",
         "extraEnvVars[0].value=1",
     ]
-    print(cmd)
     run(cmd)
 
 
