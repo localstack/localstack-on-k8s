@@ -76,7 +76,6 @@ $ awslocal apigateway --endpoint-url=http://localhost:8081 get-rest-apis
 ```
 
 We can then use a browser to open the [Web UI](http://localhost:8081/archive-bucket/index.html), which should have been deployed to an S3 bucket inside LocalStack. The Web UI can be used to interact with the sample application, send new requests to the backend, inspect the state of existing requests, etc.
-```
 
 ## License
 
