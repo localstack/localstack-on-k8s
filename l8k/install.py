@@ -70,7 +70,7 @@ class KubeCluster:
         clusters = json.loads(run([bin_file, "cluster", "list", "-o", "json"]))
         matching = [c for c in clusters if c["name"] == K3D_CLUSTER_NAME]
         if matching:
-            LOG.debug("Target k8d cluster '%s' already exists", K3D_CLUSTER_NAME)
+            LOG.debug("Target k3d cluster '%s' already exists", K3D_CLUSTER_NAME)
             return
 
         cmd = [
