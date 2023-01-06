@@ -46,6 +46,21 @@ spec:
               number: 4566
 """
 
+K3D_ACCOUNT_PERMS = """
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: localstack
+subjects:
+- kind: ServiceAccount
+  name: localstack
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: ""
+"""
+
 
 class KubeCluster:
     def install(self):
@@ -117,6 +132,21 @@ def _install_helm_chart():
         if "already exists" not in str(e):
             raise
 
+    env_vars = {
+        "DISABLE_CORS_CHECKS": "1",
+        "DNS_ADDRESS": "0",
+    }
+
+    if os.getenv("LOCALSTACK_API_KEY"):
+        env_vars["LOCALSTACK_API_KEY"] = os.getenv("LOCALSTACK_API_KEY")
+        env_vars["PROVIDER_OVERRIDE_LAMBDA"] = "asf"
+        env_vars["LAMBDA_RUNTIME_EXECUTOR"] = "kubernetes"
+        env_vars["LOCALSTACK_K8S_SERVICE_NAME"] = "default"
+        env_vars["LOCALSTACK_K8S_NAMESPACE"] = "default"
+
+    if os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING"):
+        env_vars["LAMBDA_RUNTIME_IMAGE_MAPPING"] = os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING")
+
     cmd = [
         "helm",
         "install",
@@ -124,18 +154,34 @@ def _install_helm_chart():
         "localstack/localstack",
         "--set",
         "debug=true",
-        "--set",
-        "extraEnvVars[0].name=DISABLE_CORS_CHECKS",
-        "--set-string",
-        "extraEnvVars[0].value=1",
     ]
+
+    i = 0
+    for key, value in env_vars.items():
+        cmd += [
+            "--set",
+            f"extraEnvVars[{i}].name={key}",
+            "--set-string",
+            f"extraEnvVars[{i}].value={value}",
+        ]
+        i += 1
+
     run(cmd)
 
 
 def _create_ingress():
     # TODO: potentially move to Helm chart?
+    _apply_k8s_config(KUBE_INGRESS)
+
+
+def _create_rbac_auth():
+    # TODO: potentially move to Helm chart?
+    _apply_k8s_config(K3D_ACCOUNT_PERMS)
+
+
+def _apply_k8s_config(config_str: str):
     with tempfile.NamedTemporaryFile() as f:
-        f.write(to_bytes(KUBE_INGRESS))
+        f.write(to_bytes(config_str))
         f.flush()
         run(["kubectl", "apply", "-f", f.name])
 
