@@ -137,16 +137,6 @@ def _install_helm_chart():
         "DNS_ADDRESS": "0",
     }
 
-    if os.getenv("LOCALSTACK_API_KEY"):
-        env_vars["LOCALSTACK_API_KEY"] = os.getenv("LOCALSTACK_API_KEY")
-        env_vars["PROVIDER_OVERRIDE_LAMBDA"] = "asf"
-        env_vars["LAMBDA_RUNTIME_EXECUTOR"] = "kubernetes"
-        env_vars["LOCALSTACK_K8S_SERVICE_NAME"] = "default"
-        env_vars["LOCALSTACK_K8S_NAMESPACE"] = "default"
-
-    if os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING"):
-        env_vars["LAMBDA_RUNTIME_IMAGE_MAPPING"] = os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING")
-
     cmd = [
         "helm",
         "install",
@@ -155,6 +145,14 @@ def _install_helm_chart():
         "--set",
         "debug=true",
     ]
+
+    if os.getenv("LOCALSTACK_API_KEY"):
+        env_vars["LOCALSTACK_API_KEY"] = os.getenv("LOCALSTACK_API_KEY")
+        cmd += ["--set", "lambda.executor=kubernetes"]
+        cmd += ["--set", "image.repository=localstack/localstack-pro"]
+
+    if os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING"):
+        env_vars["LAMBDA_RUNTIME_IMAGE_MAPPING"] = os.getenv("LAMBDA_RUNTIME_IMAGE_MAPPING")
 
     i = 0
     for key, value in env_vars.items():
