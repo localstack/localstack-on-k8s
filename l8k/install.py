@@ -189,7 +189,7 @@ def _wait_for_ls_ready():
         result = requests.get(health_url)
         assert result.ok
 
-    health_url = f"http://localhost:{K3D_LB_PORT}/health"
+    health_url = f"http://localhost:{K3D_LB_PORT}/_localstack/health"
     retry(_check_ready, sleep=2, retries=60)
 
 
