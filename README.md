@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> This repository has been archived.
+> 
+> Please use our official helm chart (https://github.com/localstack/helm-charts) to deploy LocalStack to kubernetes.
+
 # LocalStack on Kubernetes
 
 Sample repository that illustrates running LocalStack on Kubernetes (k8s).
